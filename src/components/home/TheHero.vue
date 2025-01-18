@@ -1,56 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, watch} from 'vue'
+import { ref, watch } from 'vue'
 import Toast from '../ui/Toast.vue'
+import { useHighlightRotation } from '@/composables/useHighlightRotation'
+import { useToast } from '@/composables/useToast'
+import { HERO_HIGHLIGHTS } from '@/constants/highlights'
 
-// Types
-interface Highlight {
-  text: string
-  color: string
-}
-
-// Rotating highlights configuration
-const highlights = ref<Highlight[]>([
-  { text: 'Patient Care', color: 'text-blue-500' },
-  { text: 'Efficiency', color: 'text-emerald-500' },
-  { text: 'Compliance', color: 'text-indigo-500' },
-  { text: 'Security', color: 'text-purple-500' },
-])
-
-// Highlight rotation state and computed
-const currentIndex = ref(0)
-const currentHighlight = computed(() => highlights.value[currentIndex.value])
-
-// Animation timing control with automatic cleanup
-let timeoutId: number
-watchEffect((onCleanup) => {
-  const rotateHighlight = () => {
-    timeoutId = setTimeout(() => {
-      currentIndex.value = (currentIndex.value + 1) % highlights.value.length
-      if (currentIndex.value === 0) {
-        setTimeout(rotateHighlight, 3000) // Longer pause at the end of cycle
-      } else {
-        rotateHighlight()
-      }
-    }, 2000) // Standard display time for each highlight
-  }
-
-  rotateHighlight()
-  onCleanup(() => clearTimeout(timeoutId))
-})
+// Use composables
+const { currentHighlight } = useHighlightRotation(HERO_HIGHLIGHTS)
+const { showToast, toastMessage, showMessage } = useToast()
 
 // Interactive demo state management
 const activeUsers = ref(42)
-const showToast = ref(false)
-const toastMessage = ref('')
 
 // Handler for active users counter with toast notification
 const incrementUsers = () => {
   activeUsers.value++
-  toastMessage.value = `Active users increased to ${activeUsers.value}`
-  showToast.value = true
-  setTimeout(() => {
-    showToast.value = false
-  }, 2000)
+  showMessage(`Active users increased to ${activeUsers.value}`)
 }
 
 // Debug: Monitor active users changes
