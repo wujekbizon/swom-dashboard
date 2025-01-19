@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import Toast from '../ui/Toast.vue'
 import { useHighlightRotation } from '@/composables/useHighlightRotation'
 import { useToast } from '@/composables/useToast'
@@ -17,11 +17,6 @@ const incrementUsers = () => {
   activeUsers.value++
   showMessage(`Active users increased to ${activeUsers.value}`)
 }
-
-// Debug: Monitor active users changes
-watch(activeUsers, (newValue, oldValue) => {
-  console.log('activeUsers changed:', { oldValue, newValue })
-})
 </script>
 
 <template>
