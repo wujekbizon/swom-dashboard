@@ -1,0 +1,224 @@
+{
+  "patients": [
+    {
+      "id": "P001",
+      "firstName": "Anna",
+      "lastName": "Kowalska",
+      "age": 72,
+      "hasInsurance": true,
+      "room": "201A",
+      "medicalHistory": {
+        "conditions": ["Nadciśnienie", "Cukrzyca typu 2"],
+        "allergies": ["Penicylina"],
+        "surgeries": [
+          {
+            "date": "2022-03-15",
+            "procedure": "Wymiana stawu biodrowego"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Metformina",
+            "dosage": "500mg",
+            "frequency": "2x dziennie"
+          },
+          {
+            "name": "Ramipril",
+            "dosage": "5mg",
+            "frequency": "1x dziennie"
+          }
+        ]
+      },
+      "healthParameters": {
+        "history": [
+          {
+            "date": "2024-03-15",
+            "bloodPressure": {
+              "systolic": 135,
+              "diastolic": 85
+            },
+            "bloodSugar": 126,
+            "heartRate": 72,
+            "oxygenSaturation": 97,
+            "temperature": 36.6
+          }
+        ],
+        "lastCheck": "2024-03-15T08:30:00"
+      }
+    },
+    {
+      "id": "P002",
+      "firstName": "Jerzy",
+      "lastName": "Nowak",
+      "age": 85,
+      "hasInsurance": true,
+      "room": "202B",
+      "medicalHistory": {
+        "conditions": ["Demencja", "Arytmia"],
+        "allergies": [],
+        "surgeries": [
+          {
+            "date": "2021-06-20",
+            "procedure": "Wszczepienie rozrusznika"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Donepezil",
+            "dosage": "10mg",
+            "frequency": "1x dziennie"
+          }
+        ]
+      },
+      "healthParameters": {
+        "history": [
+          {
+            "date": "2024-03-15",
+            "bloodPressure": {
+              "systolic": 128,
+              "diastolic": 75
+            },
+            "bloodSugar": 110,
+            "heartRate": 65,
+            "oxygenSaturation": 96,
+            "temperature": 36.8
+          }
+        ],
+        "lastCheck": "2024-03-15T09:15:00"
+      }
+    },
+    {
+      "id": "P003",
+      "firstName": "Maria",
+      "lastName": "Wiśniewska",
+      "age": 68,
+      "hasInsurance": true,
+      "room": "103A",
+      "medicalHistory": {
+        "conditions": ["Osteoporoza", "Reumatoidalne zapalenie stawów"],
+        "allergies": ["Aspiryna", "Lateks"],
+        "surgeries": [
+          {
+            "date": "2023-08-10",
+            "procedure": "Artroskopia kolana"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Alendronian",
+            "dosage": "70mg",
+            "frequency": "1x tygodniowo"
+          },
+          {
+            "name": "Metotreksat",
+            "dosage": "15mg",
+            "frequency": "1x tygodniowo"
+          }
+        ]
+      },
+      "healthParameters": {
+        "history": [
+          {
+            "date": "2024-03-15",
+            "bloodPressure": {
+              "systolic": 122,
+              "diastolic": 78
+            },
+            "bloodSugar": 95,
+            "heartRate": 68,
+            "oxygenSaturation": 98,
+            "temperature": 36.5
+          }
+        ],
+        "lastCheck": "2024-03-15T10:00:00"
+      }
+    },
+    {
+      "id": "P004",
+      "firstName": "Tadeusz",
+      "lastName": "Zieliński",
+      "age": 79,
+      "hasInsurance": true,
+      "room": "105B",
+      "medicalHistory": {
+        "conditions": ["POCHP", "Niewydolność serca"],
+        "allergies": ["Pyłki", "Roztocza"],
+        "surgeries": [],
+        "medications": [
+          {
+            "name": "Salbutamol",
+            "dosage": "100mcg",
+            "frequency": "doraźnie"
+          },
+          {
+            "name": "Furosemid",
+            "dosage": "40mg",
+            "frequency": "1x dziennie"
+          }
+        ]
+      },
+      "healthParameters": {
+        "history": [
+          {
+            "date": "2024-03-15",
+            "bloodPressure": {
+              "systolic": 142,
+              "diastolic": 88
+            },
+            "bloodSugar": 105,
+            "heartRate": 82,
+            "oxygenSaturation": 94,
+            "temperature": 36.7
+          }
+        ],
+        "lastCheck": "2024-03-15T11:30:00"
+      }
+    },
+    {
+      "id": "P005",
+      "firstName": "Barbara",
+      "lastName": "Adamska",
+      "age": 71,
+      "hasInsurance": false,
+      "room": "204A",
+      "medicalHistory": {
+        "conditions": ["Choroba Parkinsona", "Depresja"],
+        "allergies": [],
+        "surgeries": [
+          {
+            "date": "2023-11-05",
+            "procedure": "Usunięcie zaćmy"
+          }
+        ],
+        "medications": [
+          {
+            "name": "Lewodopa",
+            "dosage": "100mg",
+            "frequency": "3x dziennie"
+          },
+          {
+            "name": "Sertralina",
+            "dosage": "50mg",
+            "frequency": "1x dziennie"
+          }
+        ]
+      },
+      "healthParameters": {
+        "history": [
+          {
+            "date": "2024-03-15",
+            "bloodPressure": {
+              "systolic": 118,
+              "diastolic": 72
+            },
+            "bloodSugar": 92,
+            "heartRate": 75,
+            "oxygenSaturation": 97,
+            "temperature": 36.4
+          }
+        ],
+        "lastCheck": "2024-03-15T14:45:00"
+      }
+    }
+  ]
+} 
