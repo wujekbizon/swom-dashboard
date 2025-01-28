@@ -1,0 +1,1 @@
+export const WEEK = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Niedz']
