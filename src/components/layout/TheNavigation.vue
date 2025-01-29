@@ -1,13 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import { authApi } from '@/services/auth'
+import type { User } from '@/services/auth'
+
+const router = useRouter()
+const currentUser = ref<User | null>(null)
 
 const navigation = [
   { name: 'Home', path: '/' },
   { name: 'Dashboard', path: '/dashboard/harmonogram' },
 ]
 
-const isAuthenticated = ref(false) // This will be handled by auth state later
+async function handleLogout() {
+  authApi.logout()
+  currentUser.value = null
+  router.push('/login')
+}
+
+async function checkAuth() {
+  currentUser.value = await authApi.getCurrentUser()
+}
+
+onMounted(checkAuth)
+
+// Watch for route changes to update auth state
+watch(() => router.currentRoute.value, checkAuth)
 </script>
 
 <template>
@@ -36,7 +54,7 @@ const isAuthenticated = ref(false) // This will be handled by auth state later
 
         <!-- Right side buttons -->
         <div class="flex items-center">
-          <template v-if="!isAuthenticated">
+          <template v-if="!currentUser">
             <RouterLink
               to="/login"
               class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium"
@@ -46,15 +64,21 @@ const isAuthenticated = ref(false) // This will be handled by auth state later
             <RouterLink
               to="/signup"
               class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md 
-                     text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 
-                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-                     dark:focus:ring-offset-gray-800"
+                     text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               Sign up
             </RouterLink>
           </template>
           <template v-else>
-            <!-- Add authenticated user menu here later -->
+            <span class="text-gray-600 dark:text-gray-300 mr-4">
+              {{ currentUser.name }}
+            </span>
+            <button
+              @click="handleLogout"
+              class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium"
+            >
+              Log out
+            </button>
           </template>
         </div>
       </div>

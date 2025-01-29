@@ -6,6 +6,8 @@ import HarmonogramView from '@/views/dashboard/HarmonogramView.vue'
 import PacjentView from '@/views/dashboard/PacjentView.vue'
 import GrafikView from '@/views/dashboard/GrafikView.vue'
 import OpcjeView from '@/views/dashboard/OpcjeView.vue'
+import SignupView from '../views/auth/SignupView.vue'
+import { authApi } from '@/services/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +21,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupView,
     },
     {
       path: '/dashboard',
@@ -48,6 +55,17 @@ const router = createRouter({
       ]
     }
   ],
+})
+
+// Add navigation guard
+router.beforeEach(async (to) => {
+  const publicPages = ['/', '/login', '/signup']
+  const authRequired = !publicPages.includes(to.path)
+  const auth = await authApi.getCurrentUser()
+
+  if (authRequired && !auth) {
+    return '/login'
+  }
 })
 
 export default router

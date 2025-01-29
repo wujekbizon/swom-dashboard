@@ -1,36 +1,54 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { z } from 'zod'
+import { ref } from 'vue'
+import { z } from 'zod'
+import { useRouter } from 'vue-router'
+import { authApi } from '@/services/auth'
 
-  const email = ref('')
-  const password = ref('')
-  const rememberMe = ref(false)
-  const errors = ref<{ email?: string[]; password?: string[] }>({});
+const router = useRouter()
+const email = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+const isLoading = ref(false)
+const errors = ref<{ email?: string[]; password?: string[]; form?: string }>({})
 
-  const schema = z.object({
-    email: z.string().email('Invalid email addres'),
-    password: z.string().min(6, 'Password must be at least 6 characters long'),
-  })
+const schema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
+})
 
-  const handleSubmit = () => {
-    const result = schema.safeParse({ email: email.value, password: password.value });
+const handleSubmit = async () => {
+  try {
+    const result = schema.safeParse({ email: email.value, password: password.value })
 
     if (!result.success) {
-      errors.value = result.error.flatten().fieldErrors;
-      return;
+      errors.value = result.error.flatten().fieldErrors
+      return
     }
 
-    errors.value = {};
-    console.log('Form submitted', {
+    isLoading.value = true
+    errors.value = {}
+
+    await authApi.login({
       email: email.value,
       password: password.value,
-      rememberMe: rememberMe.value,
-    });
+    })
+
+    router.push('/dashboard/harmonogram')
+  } catch (error) {
+    errors.value.form = error instanceof Error ? error.message : 'Login failed'
+  } finally {
+    isLoading.value = false
   }
+}
 </script>
 
 <template>
   <form class="space-y-6" @submit.prevent="handleSubmit">
+    <!-- Show form-level errors -->
+    <div v-if="errors.form" class="rounded-md bg-red-50 p-4">
+      <p class="text-sm text-red-700">{{ errors.form }}</p>
+    </div>
+
     <div>
       <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
       <div class="mt-1">
@@ -64,9 +82,12 @@
     </div>
 
     <div>
-      <button type="submit"
-        class="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-        Sign in
+      <button 
+        type="submit"
+        :disabled="isLoading"
+        class="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+      >
+        {{ isLoading ? 'Signing in...' : 'Sign in' }}
       </button>
     </div>
   </form>
