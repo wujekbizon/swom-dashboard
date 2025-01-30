@@ -7,6 +7,8 @@ import PacjentView from '@/views/dashboard/PacjentView.vue'
 import GrafikView from '@/views/dashboard/GrafikView.vue'
 import OpcjeView from '@/views/dashboard/OpcjeView.vue'
 import SignupView from '../views/auth/SignupView.vue'
+import PatientDetailsView from '../views/dashboard/PatientDetailsView.vue'
+import PatientHealthView from '../views/dashboard/PatientHealthView.vue'
 import { authApi } from '@/services/auth'
 
 const router = createRouter({
@@ -38,8 +40,8 @@ const router = createRouter({
           component: HarmonogramView,
         },
         {
-          path: 'pacjent',
-          name: 'pacjent',
+          path: 'patients',
+          name: 'patients',
           component: PacjentView,
         },
         {
@@ -53,6 +55,18 @@ const router = createRouter({
           component: OpcjeView,
         }
       ]
+    },
+    {
+      path: '/dashboard/patients/:id',
+      name: 'pacjent-szczegoly',
+      component: PatientDetailsView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/dashboard/patients/:id/parametry',
+      name: 'pacjent-parametry',
+      component: PatientHealthView,
+      meta: { requiresAuth: true }
     }
   ],
 })

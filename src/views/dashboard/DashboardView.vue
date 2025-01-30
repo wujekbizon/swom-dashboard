@@ -16,7 +16,7 @@ interface NavItem {
 
 const navigation = ref<NavItem[]>([
   { name: 'Harmonogram', path: '/dashboard/harmonogram', icon: CalendarIcon },
-  { name: 'Pacjent Info', path: '/dashboard/pacjent', icon: UserIcon },
+  { name: 'Pacjenci Info', path: '/dashboard/patients', icon: UserIcon },
   { name: 'Grafik Dyżurów', path: '/dashboard/grafik', icon: ClockIcon },
   { name: 'Opcje', path: '/dashboard/opcje', icon: CogIcon },
 ])

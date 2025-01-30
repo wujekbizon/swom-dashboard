@@ -75,13 +75,7 @@ const calendarDays = computed(() => {
     const date = `${currentYear.value}-${formattedMonth}-${formattedDay}`
     
     const duty = props.duties.find(d => d.date === date)
-    if (duty) {
-      console.log('Found duty for date:', {
-        date,
-        shift: duty.shift
-      })
-    }
-
+  
     days.push({
       day,
       date,
