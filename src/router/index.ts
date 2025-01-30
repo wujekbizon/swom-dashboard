@@ -9,7 +9,7 @@ import OpcjeView from '@/views/dashboard/OpcjeView.vue'
 import SignupView from '../views/auth/SignupView.vue'
 import PatientDetailsView from '../views/dashboard/PatientDetailsView.vue'
 import PatientHealthView from '../views/dashboard/PatientHealthView.vue'
-import { authApi } from '@/services/auth'
+import { useAuth } from '@/composables/useAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -71,13 +71,14 @@ const router = createRouter({
   ],
 })
 
-// Add navigation guard
 router.beforeEach(async (to) => {
   const publicPages = ['/', '/login', '/signup']
   const authRequired = !publicPages.includes(to.path)
-  const auth = await authApi.getCurrentUser()
+  
+  const { checkAuth } = useAuth()
+  const user = await checkAuth()
 
-  if (authRequired && !auth) {
+  if (authRequired && !user) {
     return '/login'
   }
 })

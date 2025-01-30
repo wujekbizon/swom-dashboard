@@ -15,7 +15,7 @@ const events = ref([
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 p-4">
     <div class="bg-white shadow-sm rounded-lg p-6">
       <h2 class="text-2xl font-semibold text-gray-900 mb-4">Harmonogram Wizyt</h2>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

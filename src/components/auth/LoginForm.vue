@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import { z } from 'zod'
 import { useRouter } from 'vue-router'
-import { authApi } from '@/services/auth'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { login } = useAuth()
+
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
@@ -28,11 +30,7 @@ const handleSubmit = async () => {
     isLoading.value = true
     errors.value = {}
 
-    await authApi.login({
-      email: email.value,
-      password: password.value,
-    })
-
+    await login(email.value, password.value)
     router.push('/dashboard/harmonogram')
   } catch (error) {
     errors.value.form = error instanceof Error ? error.message : 'Login failed'

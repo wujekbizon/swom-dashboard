@@ -7,7 +7,7 @@ const toggleDark = useToggle(isDark)
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 p-4">
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Ustawienia</h2>
       

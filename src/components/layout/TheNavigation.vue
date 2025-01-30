@@ -1,26 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { authApi } from '@/services/auth'
-import type { User } from '@/services/auth'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
-const currentUser = ref<User | null>(null)
+const { user, logout, checkAuth } = useAuth()
 
 const navigation = [
   { name: 'Home', path: '/' },
   { name: 'Dashboard', path: '/dashboard/harmonogram' },
 ]
-
-async function handleLogout() {
-  authApi.logout()
-  currentUser.value = null
-  router.push('/login')
-}
-
-async function checkAuth() {
-  currentUser.value = await authApi.getCurrentUser()
-}
 
 onMounted(checkAuth)
 
@@ -54,7 +43,7 @@ watch(() => router.currentRoute.value, checkAuth)
 
         <!-- Right side buttons -->
         <div class="flex items-center">
-          <template v-if="!currentUser">
+          <template v-if="!user">
             <RouterLink
               to="/login"
               class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium"
@@ -71,10 +60,10 @@ watch(() => router.currentRoute.value, checkAuth)
           </template>
           <template v-else>
             <span class="text-gray-600 dark:text-gray-300 mr-4">
-              {{ currentUser.name }}
+              {{ user.name }}
             </span>
             <button
-              @click="handleLogout"
+              @click="logout"
               class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium"
             >
               Log out
