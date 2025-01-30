@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { patientApi } from '@/services/patientApi'
 import type { Patient } from '@/types/patient'
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 import { useHealthChecks } from '@/composables/useHealthChecks'
 import Badge from '@/components/ui/Badge.vue'
 import { getMedicationColor } from '@/helpers/medicationHelpers'
+import BackButton from '@/components/ui/BackButton.vue'
+import { TrashIcon } from '@heroicons/vue/24/outline'
+import ConfirmationModal from '@/components/ui/ConfirmationModal.vue'
 
 const route = useRoute()
+const router = useRouter()
 const patient = ref<Patient | null>(null)
 const isLoading = ref(true)
 const error = ref('')
+const isDeleting = ref(false)
+const showDeleteModal = ref(false)
 
 onMounted(async () => {
   try {
@@ -26,30 +32,64 @@ onMounted(async () => {
 
 // Get health checks data
 const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as string)
+
+async function handleDeletePatient() {
+  if (!patient.value) return
+  showDeleteModal.value = true
+}
+
+async function confirmDelete() {
+  if (!patient.value) return
+  
+  try {
+    isDeleting.value = true
+    await patientApi.deletePatient(patient.value.id)
+    router.push('/dashboard/patients')
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to delete patient'
+  } finally {
+    isDeleting.value = false
+    showDeleteModal.value = false
+  }
+}
 </script>
 
 <template>
   <div class="p-6">
+    <div class="mb-6">
+      <BackButton />
+    </div>
     <div v-if="isLoading" class="text-center">
       Loading...
     </div>
-    
     <div v-else-if="error" class="text-red-600">
       {{ error }}
     </div>
-
     <div v-else-if="patient" class="space-y-6">
       <!-- Patient Header -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ patient.firstName }} {{ patient.lastName }}
-        </h1>
-        <p class="text-gray-500 dark:text-gray-400">
-          Wiek: {{ patient.age }} | Pokój: {{ patient.room }}
-        </p>
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+              {{ patient.firstName }} {{ patient.lastName }}
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400">
+              Wiek: {{ patient.age }} | Pokój: {{ patient.room }}
+            </p>
+          </div>
+          <button
+            @click="handleDeletePatient"
+            :disabled="isDeleting"
+            class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-700 bg-red-100 
+                   border border-transparent rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 
+                   focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed
+                   dark:bg-red-900 dark:text-red-100 dark:hover:bg-red-800"
+          >
+            <TrashIcon class="w-4 h-4" />
+            {{ isDeleting ? 'Usuwanie...' : 'Usuń pacjenta' }}
+          </button>
+        </div>
       </div>
-
-      <!-- Tabs for different sections -->
       <TabGroup>
         <TabList class="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
           <Tab as="div" v-slot="{ selected }">
@@ -79,7 +119,6 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
             </button>
           </Tab>
         </TabList>
-
         <TabPanels class="mt-4">
           <TabPanel class="bg-white dark:bg-gray-800 rounded-lg p-6">
             <!-- General Information Panel -->
@@ -131,8 +170,6 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
                   </div>
                 </div>
               </div>
-
-              <!-- Recent Health Checks -->
               <div>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Ostatnie pomiary
@@ -159,14 +196,12 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
                           {{ check.bloodPressure.systolic }}/{{ check.bloodPressure.diastolic }}
                         </p>
                       </div>
-                      <!-- ... other health check parameters ... -->
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </TabPanel>
-
           <TabPanel class="bg-white dark:bg-gray-800 rounded-lg p-6">
             <!-- Medical History Panel -->
             <div class="space-y-6">
@@ -186,7 +221,6 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
                   </li>
                 </ul>
               </div>
-
               <div>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Alergie
@@ -203,7 +237,6 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
                   </li>
                 </ul>
               </div>
-
               <div>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Leki
@@ -229,7 +262,6 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
                   </div>
                 </div>
               </div>
-
               <div>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Zabiegi
@@ -262,5 +294,12 @@ const { healthChecks, lastCheckDate } = useHealthChecks(route.params.id as strin
         </TabPanels>
       </TabGroup>
     </div>
+    <ConfirmationModal
+      :show="showDeleteModal"
+      title="Usuń pacjenta"
+      :message="`Czy na pewno chcesz usunąć pacjenta ${patient?.firstName} ${patient?.lastName}? Ta operacja jest nieodwracalna.`"
+      @confirm="confirmDelete"
+      @cancel="showDeleteModal = false"
+    />
   </div>
 </template> 

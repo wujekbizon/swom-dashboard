@@ -5,6 +5,7 @@ import { patientApi } from '@/services/patientApi'
 import type { Patient, HealthCheck } from '@/types/patient'
 import { TrashIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import HealthCheckForm from '@/components/health-checks/HealthCheckForm.vue'
+import BackButton from '@/components/ui/BackButton.vue'
 
 const route = useRoute()
 const patient = ref<Patient | null>(null)
@@ -94,6 +95,11 @@ async function saveEditedHealthCheck() {
 
 <template>
   <div class="p-6">
+    <!-- Add back button at the top -->
+    <div class="mb-6">
+      <BackButton />
+    </div>
+
     <div v-if="isLoading" class="text-center">
       Loading...
     </div>
