@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { useDark, useToggle } from '@vueuse/core'
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/outline'
+import { useAuditLogsStore } from '@/stores/auditLogs'
+import { ref } from 'vue'
 
 const isDark = useDark()
 const toggleDark = useToggle(isDark)
+const auditLogsStore = useAuditLogsStore()
+const showAuditLogs = ref(false)
+
+async function toggleAuditLogs() {
+  if (!showAuditLogs.value) {
+    await auditLogsStore.fetchLogs()
+  }
+  showAuditLogs.value = !showAuditLogs.value
+}
 </script>
 
 <template>
@@ -25,6 +36,51 @@ const toggleDark = useToggle(isDark)
           <SunIcon v-if="isDark" class="h-5 w-5 text-gray-900 dark:text-white" />
           <MoonIcon v-else class="h-5 w-5 text-gray-900 dark:text-white" />
         </button>
+      </div>
+
+      <!-- Audit Logs -->
+      <div class="mt-6">
+        <div class="flex items-center justify-between py-3 border-b dark:border-gray-700">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">System Auditing</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ auditLogsStore.isAuditing 
+                ? `Active session (${auditLogsStore.getSessionDuration()})` 
+                : 'No active session' }}
+            </p>
+          </div>
+          <button
+            @click="toggleAuditLogs"
+            class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+          >
+            {{ showAuditLogs ? 'Hide Logs' : 'Show Logs' }}
+          </button>
+        </div>
+
+        <!-- Audit Logs Table -->
+        <div v-if="showAuditLogs" class="mt-4 overflow-x-auto">
+          <table class="min-w-full bg-white dark:bg-gray-800">
+            <thead>
+              <tr>
+                <th class="px-4 py-2 text-left">Time</th>
+                <th class="px-4 py-2 text-left">User</th>
+                <th class="px-4 py-2 text-left">Action</th>
+                <th class="px-4 py-2 text-left">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="log in auditLogsStore.logs" :key="log.id" 
+                  class="border-t dark:border-gray-700">
+                <td class="px-4 py-2">{{ new Date(log.timestamp).toLocaleString() }}</td>
+                <td class="px-4 py-2">{{ log.userName }}</td>
+                <td class="px-4 py-2">{{ log.action }}</td>
+                <td class="px-4 py-2">
+                  <pre class="text-sm">{{ JSON.stringify(log.details, null, 2) }}</pre>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

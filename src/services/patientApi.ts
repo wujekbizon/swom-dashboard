@@ -172,10 +172,9 @@ export const patientApi = {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          patientId,
           updates: {
             ...updates,
-            date: date
+            date
           }
         })
       })

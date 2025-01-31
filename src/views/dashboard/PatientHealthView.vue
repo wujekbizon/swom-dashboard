@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { patientApi } from '@/services/patientApi'
 import type { Patient, HealthCheck } from '@/types/patient'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { TrashIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import HealthCheckForm from '@/components/health-checks/HealthCheckForm.vue'
 import BackButton from '@/components/ui/BackButton.vue'
@@ -15,6 +16,7 @@ const isLoadingHealthChecks = ref(false)
 const error = ref('')
 const editingHealthCheck = ref<{ index: number; check: HealthCheck } | null>(null)
 const isAddingHealthCheck = ref(false)
+const { logAction } = useAuditLog()
 
 // Load both patient and health checks data
 onMounted(async () => {
@@ -44,6 +46,19 @@ async function addHealthCheck(healthCheck: HealthCheck) {
     const data = await patientApi.getHealthChecks(patient.value.id)
     healthChecks.value = data.healthChecks
     isAddingHealthCheck.value = false
+
+    // Log the action
+    logAction('UPDATE_PATIENT', {
+      action: 'add_health_check',
+      patientId: patient.value.id,
+      patientName: `${patient.value.firstName} ${patient.value.lastName}`,
+      healthCheck: {
+        date: healthCheck.date,
+        bloodPressure: healthCheck.bloodPressure,
+        heartRate: healthCheck.heartRate,
+        // ... other vital signs
+      }
+    })
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to add health check'
   }
@@ -60,6 +75,14 @@ async function handleDeleteHealthCheck(date: string) {
     // Refresh health checks
     const data = await patientApi.getHealthChecks(patient.value.id)
     healthChecks.value = data.healthChecks
+
+    // Log the deletion
+    logAction('UPDATE_PATIENT', {
+      action: 'delete_health_check',
+      patientId: patient.value.id,
+      patientName: `${patient.value.firstName} ${patient.value.lastName}`,
+      deletedCheckDate: date
+    })
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to delete health check'
   } finally {
@@ -74,18 +97,35 @@ async function handleEditHealthCheck(index: number, check: HealthCheck) {
   }
 }
 
-async function saveEditedHealthCheck() {
+async function saveEditedHealthCheck(updatedCheck: HealthCheck) {
   if (!patient.value || !editingHealthCheck.value) return
 
   try {
+    // Keep the original date when updating
+    const checkToUpdate = {
+      ...updatedCheck,
+      date: editingHealthCheck.value.check.date // Keep original date
+    }
+
     await patientApi.updateHealthCheck(
       patient.value.id,
-      editingHealthCheck.value.check.date,
-      editingHealthCheck.value.check
+      checkToUpdate.date,
+      checkToUpdate
     )
+    
     // Refresh health checks
     const data = await patientApi.getHealthChecks(patient.value.id)
     healthChecks.value = data.healthChecks
+    
+    // Log the update
+    logAction('UPDATE_PATIENT', {
+      action: 'edit_health_check',
+      patientId: patient.value.id,
+      patientName: `${patient.value.firstName} ${patient.value.lastName}`,
+      checkDate: checkToUpdate.date,
+      updatedData: checkToUpdate
+    })
+    
     editingHealthCheck.value = null
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to update health check'
@@ -218,6 +258,25 @@ async function saveEditedHealthCheck() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Add Edit Health Check Modal -->
+    <div
+      v-if="editingHealthCheck"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full">
+        <h3 class="text-lg font-medium mb-4 text-gray-900 dark:text-white">
+          Edytuj pomiar
+        </h3>
+        
+        <HealthCheckForm
+          mode="edit"
+          :initial-data="editingHealthCheck.check"
+          @submit="saveEditedHealthCheck"
+          @cancel="editingHealthCheck = null"
+        />
       </div>
     </div>
   </div>

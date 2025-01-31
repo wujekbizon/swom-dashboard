@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { HealthCheck } from '@/types/patient'
 
 const props = defineProps<{
-  initialValues?: HealthCheck
   mode?: 'add' | 'edit'
+  initialData?: HealthCheck
 }>()
 
 const emit = defineEmits<{
@@ -15,14 +15,20 @@ const emit = defineEmits<{
 const form = ref<HealthCheck>({
   date: new Date().toISOString(),
   bloodPressure: {
-    systolic: props.initialValues?.bloodPressure.systolic ?? 120,
-    diastolic: props.initialValues?.bloodPressure.diastolic ?? 80
+    systolic: props.initialData?.bloodPressure.systolic ?? 120,
+    diastolic: props.initialData?.bloodPressure.diastolic ?? 80
   },
-  bloodSugar: props.initialValues?.bloodSugar ?? 100,
-  heartRate: props.initialValues?.heartRate ?? 70,
-  oxygenSaturation: props.initialValues?.oxygenSaturation ?? 98,
-  temperature: props.initialValues?.temperature ?? 36.6
+  bloodSugar: props.initialData?.bloodSugar ?? 100,
+  heartRate: props.initialData?.heartRate ?? 70,
+  oxygenSaturation: props.initialData?.oxygenSaturation ?? 98,
+  temperature: props.initialData?.temperature ?? 36.6
 })
+
+watch(() => props.initialData, (newData) => {
+  if (newData) {
+    form.value = { ...newData }
+  }
+}, { deep: true })
 
 function handleSubmit() {
   emit('submit', form.value)

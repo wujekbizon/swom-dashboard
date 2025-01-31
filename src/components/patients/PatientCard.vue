@@ -3,17 +3,25 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Patient } from '@/types/patient'
 import { useHealthChecks } from '@/composables/useHealthChecks'
+import { useAuditLog } from '@/composables/useAuditLog'
 
 const props = defineProps<{
   patient: Patient
 }>()
 
 const router = useRouter()
+const { logAction } = useAuditLog()
 
 // Use the health checks composable
 const { lastCheckDate, measurementsCount } = useHealthChecks(props.patient.id)
 
-function navigateToPatient() {
+function viewPatientDetails() {
+  logAction('VIEW_PATIENT', {
+    patientId: props.patient.id,
+    patientName: `${props.patient.firstName} ${props.patient.lastName}`,
+    viewedFrom: 'patient-list'
+  })
+  
   router.push(`/dashboard/patients/${props.patient.id}`)
 }
 
@@ -25,7 +33,7 @@ function handleHealthParamsClick(e: Event) {
 
 <template>
   <div
-    @click="navigateToPatient"
+    @click="viewPatientDetails"
     class="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md 
            transition-shadow duration-200 cursor-pointer overflow-hidden"
   >

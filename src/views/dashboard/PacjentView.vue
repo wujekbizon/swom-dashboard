@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { patientApi } from '@/services/patientApi'
 import type { Patient } from '@/types/patient'
+import { useAuditLog } from '@/composables/useAuditLog'
 import AddPatientForm from '@/components/patients/AddPatientForm.vue'
 import PatientCard from '@/components/patients/PatientCard.vue'
 
@@ -9,6 +10,7 @@ const patients = ref<Patient[]>([])
 const isLoading = ref(true)
 const error = ref('')
 const isAddingPatient = ref(false)
+const { logAction } = useAuditLog()
 
 // Load patients on mount
 onMounted(async () => {
@@ -24,10 +26,18 @@ onMounted(async () => {
 
 async function handleAddPatient(patient: Omit<Patient, 'id'>) {
   try {
-    await patientApi.createPatient(patient)
+    const newPatient = await patientApi.createPatient(patient)
     const data = await patientApi.getAllPatients()
     patients.value = data
     isAddingPatient.value = false
+    
+    // Log patient creation
+    logAction('CREATE_PATIENT', {
+      patientId: newPatient.id,
+      patientName: `${patient.firstName} ${patient.lastName}`,
+      room: patient.room,
+      age: patient.age
+    })
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to add patient'
   }
